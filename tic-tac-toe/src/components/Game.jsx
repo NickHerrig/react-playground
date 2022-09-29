@@ -3,21 +3,35 @@ import '../index.css'
 
 
 function Square(props) {
-  const  [value, setValue] = useState();
+  
   return (
     <button 
     className="square" 
-    onClick={ () => setValue('X') }>
-      {value}
+    onClick={props.onClick}>
+      {props.value}
     </button>
   )
 }
 
 function Board(props) {
-  const renderSquare = (i) => {
-    return <Square value={i} />
+  const [squares, setSquares] = useState(Array(9).fill(null));
+  const [xIsNext, setXIsNext] = useState(true);
+
+  const handleClick = (i) => {
+    const squaresCopy = squares.slice();
+    squaresCopy[i] = xIsNext ? 'X' : 'O';
+    setSquares(squaresCopy);
+    setXIsNext(!xIsNext);
   }
-  const status = 'Next player: X';
+
+  const renderSquare = (i) => {
+    return <Square 
+      value={squares[i]}
+      onClick={() => handleClick(i)}
+    />
+  }
+
+  const status = `Next player: ${xIsNext ? 'X' : 'O'}`;
   return (
     
     <div>
@@ -53,5 +67,4 @@ export function Game(props) {
       </div>
     </div>
   )
-
 }
