@@ -14,38 +14,17 @@ function Square(props) {
 }
 
 function Board(props) {
-  const [squares, setSquares] = useState(Array(9).fill(null));
-  const [xIsNext, setXIsNext] = useState(true);
-
-  const handleClick = (i) => {
-    if (calculateWinner(squares) || squares[i]) {
-      return
-    }
-    const squaresCopy = squares.slice();
-    squaresCopy[i] = xIsNext ? 'X' : 'O';
-    setSquares(squaresCopy);
-    setXIsNext(!xIsNext);
-  }
 
   const renderSquare = (i) => {
     return <Square 
-      value={squares[i]}
-      onClick={() => handleClick(i)}
+      value={props.squares[i]}
+      onClick={() => props.onClick(i)}
     />
-  }
-
-  const winner = calculateWinner(squares);
-  let status
-  if (winner) {
-    status = 'Winner: ' + winner;
-  } else {
-    status = `Next player: ${xIsNext ? 'X' : 'O'}`; 
   }
 
   return (
     
     <div>
-      <div className="status">{status}</div>
       <div className="board-row">
         {renderSquare(0)}
         {renderSquare(1)}
@@ -66,13 +45,38 @@ function Board(props) {
 }
 
 export function Game(props) {
+  const [history, setHistory] = useState([{"squares": Array(9).fill(null)}]);
+  const [xIsNext, setXIsNext] = useState(true);
+  const current = history[history.length - 1];
+
+  const handleClick = (i) => {
+    if (calculateWinner(current.squares) || current.squares[i]) {
+      return
+    }
+    const squaresCopy = current.squares.slice();
+    squaresCopy[i] = xIsNext ? 'X' : 'O';
+    setHistory(history.concat([{"squares":squaresCopy}]))
+    setXIsNext(!xIsNext);
+  }
+
+  const winner = calculateWinner(current.squares);
+  let status
+  if (winner) {
+    status = 'Winner: ' + winner;
+  } else {
+    status = `Next player: ${xIsNext ? 'X' : 'O'}`; 
+  }
+
   return (
     <div className="game">
       <div className="game-board">
-        <Board />
+        <Board 
+          squares={current.squares}
+          onClick={(i) => handleClick(i)}
+        />
       </div>
       <div className="game-info">
-        <div>{/* status */}</div>
+        <div>{status}</div>
         <ol>{/* TODO */}</ol>
       </div>
     </div>
